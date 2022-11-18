@@ -5,24 +5,25 @@
 
 // Load Wi-Fi library
 #include <ESP8266WiFi.h>
+#include "io.h"
 
 // Replace with your network credentials
-const char* ssid     = "REPLACE_WITH_YOUR_SSID";
-const char* password = "REPLACE_WITH_YOUR_PASSWORD";
+const char* ssid     = "The Ranch";
+const char* password = "8054919190";
 
 // Set web server port number to 80
 WiFiServer server(80);
+IO io;
+
 
 // Variable to store the HTTP request
 String header;
 
 // Auxiliar variables to store the current output state
 String output5State = "off";
-String output4State = "off";
 
 // Assign output variables to GPIO pins
-const int output5 = 5;
-const int output4 = 4;
+// const int output5 = A0;
 
 // Current time
 unsigned long currentTime = millis();
@@ -32,13 +33,7 @@ unsigned long previousTime = 0;
 const long timeoutTime = 2000;
 
 void setup() {
-  Serial.begin(115200);
-  // Initialize the output variables as outputs
-  pinMode(output5, OUTPUT);
-  pinMode(output4, OUTPUT);
-  // Set outputs to LOW
-  digitalWrite(output5, LOW);
-  digitalWrite(output4, LOW);
+  Serial.begin(9600);
 
   // Connect to Wi-Fi network with SSID and password
   Serial.print("Connecting to ");
@@ -54,6 +49,7 @@ void setup() {
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
   server.begin();
+  io.init();
 }
 
 void loop(){
@@ -85,20 +81,12 @@ void loop(){
             if (header.indexOf("GET /5/on") >= 0) {
               Serial.println("GPIO 5 on");
               output5State = "on";
-              digitalWrite(output5, HIGH);
+              io.turnOnPin5();
             } else if (header.indexOf("GET /5/off") >= 0) {
               Serial.println("GPIO 5 off");
               output5State = "off";
-              digitalWrite(output5, LOW);
-            } else if (header.indexOf("GET /4/on") >= 0) {
-              Serial.println("GPIO 4 on");
-              output4State = "on";
-              digitalWrite(output4, HIGH);
-            } else if (header.indexOf("GET /4/off") >= 0) {
-              Serial.println("GPIO 4 off");
-              output4State = "off";
-              digitalWrite(output4, LOW);
-            }
+              io.turnOffPin5();
+            } 
             
             // Display the HTML web page
             client.println("<!DOCTYPE html><html>");
@@ -112,7 +100,7 @@ void loop(){
             client.println(".button2 {background-color: #77878A;}</style></head>");
             
             // Web Page Heading
-            client.println("<body><h1>ESP8266 Web Server</h1>");
+            client.println("<body><h1>Web Server</h1>");
             
             // Display current state, and ON/OFF buttons for GPIO 5  
             client.println("<p>GPIO 5 - State " + output5State + "</p>");
@@ -123,14 +111,6 @@ void loop(){
               client.println("<p><a href=\"/5/off\"><button class=\"button button2\">OFF</button></a></p>");
             } 
                
-            // Display current state, and ON/OFF buttons for GPIO 4  
-            client.println("<p>GPIO 4 - State " + output4State + "</p>");
-            // If the output4State is off, it displays the ON button       
-            if (output4State=="off") {
-              client.println("<p><a href=\"/4/on\"><button class=\"button\">ON</button></a></p>");
-            } else {
-              client.println("<p><a href=\"/4/off\"><button class=\"button button2\">OFF</button></a></p>");
-            }
             client.println("</body></html>");
             
             // The HTTP response ends with another blank line
