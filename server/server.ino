@@ -90,15 +90,15 @@ void loop() {
             client.println(".button2 {background-color: #77878A;}</style></head>");
 
             // Web Page Heading
-            client.println("<body><h1>Web Server</h1>");
+            client.println("<body><h1>Hot Water Circulating Pump</h1>");
 
             // Display current state, and ON/OFF buttons for GPIO 5
-            client.println("<p>GPIO 5 - State " + output5State + "</p>");
+            client.println("<p>The pump is currently " + output5State + "</p>");
             // If the output5State is off, it displays the ON button
             if (output5State == "off") {
-              client.println("<p><a href=\"/5/on\"><button class=\"button\">ON</button></a></p>");
+              client.println("<p><a href=\"/5/on\"><button class=\"button\">Turn the pump ON</button></a></p>");
             } else {
-              client.println("<p><a href=\"/5/off\"><button class=\"button button2\">OFF</button></a></p>");
+              client.println("<p><a href=\"/5/off\"><button class=\"button button2\"> Turn the pump OFF</button></a></p>");
             }
 
             client.println("</body></html>");
