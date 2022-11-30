@@ -4,6 +4,8 @@
 
 Adafruit_MPU6050 mpu;
 
+void sensorSetup();
+
 void setup(void) {
   Serial.begin(9600);
   while (!Serial)
@@ -20,6 +22,35 @@ void setup(void) {
   }
   Serial.println("MPU6050 Found!");
 
+  sensorSetup();
+
+  Serial.println("");
+  delay(100);
+}
+
+int loopNum = 0;
+void loop() {
+  /* Get new sensor events with the readings */
+  sensors_event_t a, g, temp;
+  mpu.getEvent(&a, &g, &temp);
+
+  int x, y, z;
+
+  x = abs(g.gyro.x);
+  y = abs(g.gyro.y);
+  z = abs(g.gyro.z);
+
+  if(x > 0.05 || y > 0.05 || z > 0.05){
+		Serial.println(loopNum);
+		Serial.println("Toby is going to shit");
+		loopNum = loopNum + 1;
+
+  }
+
+  delay(200);
+}
+
+void sensorSetup(){
   mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
   Serial.print("Accelerometer range set to: ");
   switch (mpu.getAccelerometerRange()) {
@@ -78,24 +109,4 @@ void setup(void) {
       Serial.println("5 Hz");
       break;
   }
-
-  Serial.println("");
-  delay(100);
-}
-
-void loop() {
-  /* Get new sensor events with the readings */
-  sensors_event_t a, g, temp;
-  mpu.getEvent(&a, &g, &temp);
-
-  int x, y, z;
-
-  x = abs(g.gyro.x);
-  y = abs(g.gyro.y);
-  z = abs(g.gyro.z);
-
-  if(x > 0.05 || y > 0.05 || z > 0.05){
-    Serial.println("Toby is going to shit");
-  }
-  delay(100);
 }

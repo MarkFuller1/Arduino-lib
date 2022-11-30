@@ -1,0 +1,68 @@
+#! /usr/bin/bash
+
+SOURCES="$(pwd)" #current dir
+PORT="/dev/ttyUSB0" #my default port
+UPLOAD=false
+COMPILE=false 
+MONITOR=false
+
+echo "Defaults $SOURCES : $PORT : $UPLOAD : $COMPILE"
+
+while getopts "cump:s:" opt; do
+	case $opt in 
+		c)
+			echo "-- Compiling first sources: $OPTARG" >&2
+			COMPILE=true
+		;;
+		u)
+			echo "-- Uploading to: $OPTARG" >&2
+			UPLOAD=true
+		;;
+		m)
+			echo "-- Monitoring port" >&2
+			MONITOR=true
+		;;
+		p)
+			echo "-- Port specified to: $OPTARG" >&2
+			PORT=$OPTARG
+		;;
+		s)
+			echo "-- Sources specified as: $OPTARG" >&2
+			SOURCES=$OPTARG
+		;;
+	esac
+done
+
+
+echo "Changed to $SOURCES : $PORT : $UPLOAD : $COMPILE : $MONITOR"
+
+
+if [ "$COMPILE" = true ] ;
+then 
+	echo "-------------------------"
+	echo "---------COMPILING-------"
+	echo "-------------------------"
+	compile.sh $SOURCES
+fi
+
+if [ "$UPLOAD" = true ] ;
+then 
+	echo "-------------------------"
+	echo "---------UPLOADING-------"
+	echo "-------------------------"
+	arduino-cli upload --port $PORT --fqbn esp8266:esp8266:nodemcuv2 $SOURCES --verbose
+fi
+
+if [ "$MONITOR" = true ];
+then 
+	echo "-------------------------"
+	echo "---------MONITORING------"
+	echo "-------------------------"
+	arduino-cli monitor -p $PORT
+fi
+
+
+# if [[ $* == *-m* ]]
+# then 
+	# arduino-cli monitor -p $PORT
+# fi
