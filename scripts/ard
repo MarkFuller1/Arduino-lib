@@ -43,6 +43,14 @@ then
 	echo "---------COMPILING-------"
 	echo "-------------------------"
 	compile.sh $SOURCES
+	RESULT=$?
+fi
+
+echo $RESULT
+
+if [ "$RESULT" = "1" ] ; 
+then
+	exit 1;
 fi
 
 if [ "$UPLOAD" = true ] ;

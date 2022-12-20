@@ -1,10 +1,51 @@
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
-#include <Wire.h>
+// #include <Wire.h>
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
+#include <WiFiClient.h>
+#include "net.h"
+
+const char* ssid = "The Ranch";
+const char* password = "8054919190";
+
+const char* serverName = "http://192.168.1.5:8080";
+
+// start server
+WiFiServer server(80);
 
 Adafruit_MPU6050 mpu;
 
 void sensorSetup();
+
+void makeGET(){
+	WiFiClient client;
+	HTTPClient http;
+
+      String serverPath = serverName;
+      
+      // Your Domain name with URL path or IP address with path
+      http.begin(client, serverPath.c_str());
+  
+      // If you need Node-RED/server authentication, insert user and password below
+      //http.setAuthorization("REPLACE_WITH_SERVER_USERNAME", "REPLACE_WITH_SERVER_PASSWORD");
+        
+      // Send HTTP GET request
+      int httpResponseCode = http.GET();
+      
+      if (httpResponseCode>0) {
+        Serial.print("HTTP Response code: ");
+        Serial.println(httpResponseCode);
+        String payload = http.getString();
+        Serial.println(payload);
+      }
+      else {
+        Serial.print("Error code: ");
+        Serial.println(httpResponseCode);
+      }
+      // Free resources
+      http.end();
+}
 
 void setup(void) {
   Serial.begin(9600);
@@ -24,6 +65,8 @@ void setup(void) {
 
   sensorSetup();
 
+  Net::StaticConnect(ssid,password,4);
+
   Serial.println("");
   delay(100);
 }
@@ -42,7 +85,8 @@ void loop() {
 
   if(x > 0.05 || y > 0.05 || z > 0.05){
 		Serial.println(loopNum);
-		Serial.println("Toby is going to shit");
+		makeGET();
+		Serial.println("Toby is going to shit:");
 		loopNum = loopNum + 1;
 
   }
