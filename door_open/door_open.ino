@@ -65,7 +65,7 @@ void setup(void) {
 
   sensorSetup();
 
-  Net::StaticConnect(ssid,password,4);
+  Net::StaticConnect(ssid,password,11);
 
   Serial.println("");
   delay(100);
