@@ -5,10 +5,11 @@ PORT="/dev/ttyUSB0" #my default port
 UPLOAD=false
 COMPILE=false 
 MONITOR=false
+BOARD=esp8266:esp8266:nodemcuv2
 
-echo "Defaults $SOURCES : $PORT : $UPLOAD : $COMPILE"
+echo "Defaults $SOURCES : $PORT : $UPLOAD : $COMPILE : $BOARD"
 
-while getopts "cump:s:" opt; do
+while getopts "cump:s:b" opt; do
 	case $opt in 
 		c)
 			echo "-- Compiling first sources: $OPTARG" >&2
@@ -30,11 +31,14 @@ while getopts "cump:s:" opt; do
 			echo "-- Sources specified as: $OPTARG" >&2
 			SOURCES=$OPTARG
 		;;
+    b)
+      echo "-- Board changed to mega"
+      BOARD=arduino:avr:mega
 	esac
 done
 
 
-echo "Changed to $SOURCES : $PORT : $UPLOAD : $COMPILE : $MONITOR"
+echo "Changed to $SOURCES : $PORT : $UPLOAD : $COMPILE : $MONITOR : $BOARD"
 
 
 if [ "$COMPILE" = true ] ;
@@ -42,7 +46,7 @@ then
 	echo "-------------------------"
 	echo "---------COMPILING-------"
 	echo "-------------------------"
-	compile.sh $SOURCES
+	compile.sh $SOURCES $BOARD
 	RESULT=$?
 fi
 
@@ -58,7 +62,7 @@ then
 	echo "-------------------------"
 	echo "---------UPLOADING-------"
 	echo "-------------------------"
-	arduino-cli upload --port $PORT --fqbn esp8266:esp8266:nodemcuv2 $SOURCES --verbose
+	arduino-cli upload --port $PORT --fqbn $BOARD $SOURCES --verbose
 fi
 
 if [ "$MONITOR" = true ];
